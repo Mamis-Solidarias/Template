@@ -1,0 +1,1 @@
+docker build -t TEMPLATE:latest -f MamisSolidarias.WebAPI.TEMPLATE/Dockerfile .

@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8EBAAF5D-8085-4137-847A-E0BD5183F4CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{87839CC5-313C-4A34-8EA1-2CBB2D7BAC4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MamisSolidarias.WebAPI.TEMPLATE", "MamisSolidarias.WebAPI.TEMPLATE\MamisSolidarias.WebAPI.TEMPLATE.csproj", "{221B61FA-B84B-45C5-9F79-550AD1482AC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MamisSolidarias.HttpClient.TEMPLATE", "MamisSolidarias.HttpClient.TEMPLATE\MamisSolidarias.HttpClient.TEMPLATE.csproj", "{2922340F-FF6B-4670-B170-B2D965A9BBE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{221B61FA-B84B-45C5-9F79-550AD1482AC7} = {8EBAAF5D-8085-4137-847A-E0BD5183F4CC}
+		{2922340F-FF6B-4670-B170-B2D965A9BBE3} = {8EBAAF5D-8085-4137-847A-E0BD5183F4CC}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{221B61FA-B84B-45C5-9F79-550AD1482AC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{221B61FA-B84B-45C5-9F79-550AD1482AC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{221B61FA-B84B-45C5-9F79-550AD1482AC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{221B61FA-B84B-45C5-9F79-550AD1482AC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2922340F-FF6B-4670-B170-B2D965A9BBE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2922340F-FF6B-4670-B170-B2D965A9BBE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2922340F-FF6B-4670-B170-B2D965A9BBE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2922340F-FF6B-4670-B170-B2D965A9BBE3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
