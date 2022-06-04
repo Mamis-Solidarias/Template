@@ -1,9 +1,11 @@
 using FastEndpoints;
+using MamisSolidarias.Infrastructure.TEMPLATE;
 
 namespace MamisSolidarias.WebAPI.TEMPLATE.Endpoints.Test;
 
 public class Endpoint : Endpoint<Request, Response>
 {
+    public TEMPLATEDbContext DbContext { get; set; }
     public override void Configure()
     {
         Get("user/{Name}");

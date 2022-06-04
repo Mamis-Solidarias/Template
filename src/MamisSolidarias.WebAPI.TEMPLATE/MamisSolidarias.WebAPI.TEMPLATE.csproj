@@ -8,9 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints" Version="4.1.0"/>
-        <PackageReference Include="FastEndpoints.Security" Version="4.1.0"/>
-        <PackageReference Include="FastEndpoints.Swagger" Version="4.1.0"/>
+        <PackageReference Include="FastEndpoints" Version="4.1.0" />
+        <PackageReference Include="FastEndpoints.Security" Version="4.1.0" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="4.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MamisSolidarias.Infrastructure.TEMPLATE\MamisSolidarias.Infrastructure.TEMPLATE.csproj" />
     </ItemGroup>
 
 </Project>
