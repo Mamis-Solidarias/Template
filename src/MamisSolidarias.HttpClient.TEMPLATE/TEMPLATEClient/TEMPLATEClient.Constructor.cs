@@ -1,34 +1,29 @@
-using Flurl;
-using Flurl.Http;
 using MamisSolidarias.HttpClient.TEMPLATE.Models;
 using MamisSolidarias.HttpClient.TEMPLATE.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 
 namespace MamisSolidarias.HttpClient.TEMPLATE.TEMPLATEClient;
 
 public partial class TEMPLATEClient : ITEMPLATEClient
 {
-    private readonly TEMPLATEConfiguration _configuration;
     private readonly HeaderService _headerService;
-
-    public TEMPLATEClient(IHttpContextAccessor ctxa, IConfiguration configuration)
+    private readonly IHttpClientFactory _httpClientFactory;
+    
+    public TEMPLATEClient(IHttpContextAccessor? contextAccessor,IHttpClientFactory httpClientFactory)
     {
-        _configuration = new TEMPLATEConfiguration();
-        configuration.GetSection("TEMPLATEHttpClient").Bind(_configuration);
-        _headerService = new HeaderService(ctxa);
+        _httpClientFactory = httpClientFactory;
+        _headerService = new HeaderService(contextAccessor);
     }
-
-    private ReadyRequest<T> CreateRequest<T>(params string[] urlParams)
+    
+    private ReadyRequest<TResponse> CreateRequest<TResponse>(HttpMethod httpMethod,params string[] urlParams)
     {
-        var url = new Url(_configuration.BaseUrl).AppendPathSegments(urlParams as object[]);
+        var client = _httpClientFactory.CreateClient("TEMPLATE");
+        var request = new HttpRequestMessage(httpMethod, string.Join('/', urlParams));
+        
         var authHeader = _headerService.GetAuthorization();
-        var request = authHeader switch
-        {
-            null => new FlurlRequest(url),
-            _ => new FlurlRequest(url).WithHeader("Authorization", authHeader)
-        };
-
-        return new ReadyRequest<T>(request, _configuration);
+        if (authHeader is not null)
+            request.Headers.Add("Authorization",authHeader);
+        
+        return new ReadyRequest<TResponse>(client,request);
     }
 }

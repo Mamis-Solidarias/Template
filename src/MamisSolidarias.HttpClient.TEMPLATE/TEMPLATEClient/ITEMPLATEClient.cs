@@ -4,5 +4,5 @@ namespace MamisSolidarias.HttpClient.TEMPLATE.TEMPLATEClient;
 
 public interface ITEMPLATEClient
 {
-    Task<(int, Response?)> GetTestAsync(Request requestParameters, CancellationToken token = default);
+    Task<Response?> GetTestAsync(Request requestParameters, CancellationToken token = default);
 }

@@ -6,7 +6,7 @@ namespace MamisSolidarias.HttpClient.TEMPLATE.Utils;
 internal class ConfigurationFactory
 {
     internal static IConfiguration GetTEMPLATEConfiguration(
-        string baseUrl = "https://test.com", int retries = 3, int timeout = 5
+        string baseUrl = "https://test.com", int retries = 3, int timeout = 500
     )
     {
         var inMemorySettings = new Dictionary<string, string>

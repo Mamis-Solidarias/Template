@@ -1,6 +1,5 @@
-using Flurl.Http;
-using MamisSolidarias.HttpClient.TEMPLATE.Services;
-using Polly;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace MamisSolidarias.HttpClient.TEMPLATE.Models;
 
@@ -10,33 +9,42 @@ namespace MamisSolidarias.HttpClient.TEMPLATE.Models;
 /// <typeparam name="TResponse">Type of the response object</typeparam>
 internal class ReadyRequest<TResponse>
 {
-    private readonly AsyncPolicy _policy;
-    private readonly FlurlRequest _request;
+    private readonly System.Net.Http.HttpClient _client;
+    private readonly HttpRequestMessage _requestMessage;
 
-    public ReadyRequest(FlurlRequest request, TEMPLATEConfiguration configuration, AsyncPolicy? policy = null)
+    public ReadyRequest(System.Net.Http.HttpClient client, HttpRequestMessage request)
     {
-        _request = request;
-        _policy = policy ?? PolicyManager.BuildRetryPolicy(configuration.Retries, configuration.Timeout);
+        _client = client;
+        _requestMessage = request;
     }
+    
+    /// <summary>
+    /// It loads the request body into the request
+    /// </summary>
+    /// <param name="body">Content to load into the request</param>
+    /// <typeparam name="TRequest">Type of the expected response</typeparam>
+    /// <returns>An http request</returns>
+    public ReadyRequest<TResponse> WithContent<TRequest>(TRequest body)
+    {
+        var data = JsonSerializer.SerializeToUtf8Bytes(body);
+        _requestMessage.Content = new ByteArrayContent(data);
+        return this;
+    }
+
 
     /// <summary>
-    /// It executes a request with the selected policy.
+    /// It executes the http request
     /// </summary>
-    /// <param name="action">Http Request to the URL</param>
-    /// <param name="token">Cancellation token</param>
-    /// <returns>The status code of the request and the request body itself. If the request was successful it will always return 200</returns>
-    public async Task<(int, TResponse?)> ExecuteAsync(Func<IFlurlRequest, CancellationToken, Task<TResponse>> action,
-        CancellationToken token = default)
+    /// <param name="token"></param>
+    /// <typeparam name="TResponse">Type of the expected response</typeparam>
+    /// <returns>The expected response body</returns>
+    /// <exception cref="HttpRequestException">The request has not been successful</exception>
+    public async Task<TResponse?> ExecuteAsync(CancellationToken token)
     {
-        var policyResult = await _policy.ExecuteAndCaptureAsync(
-            async cancellationToken => await action.Invoke(_request, cancellationToken),
-            token
-        );
-
-        var statusCode = 200;
-        if (policyResult.Outcome is OutcomeType.Failure)
-            statusCode = (policyResult.FinalException as FlurlHttpException)?.StatusCode ?? 500;
-
-        return (statusCode, policyResult.Result);
+        var response = await _client.SendAsync(_requestMessage, token);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TResponse>(cancellationToken: token);
     }
+
+
 }

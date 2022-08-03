@@ -3,9 +3,15 @@ using MamisSolidarias.Infrastructure.TEMPLATE;
 
 namespace MamisSolidarias.WebAPI.TEMPLATE.Endpoints.Test;
 
-public class Endpoint : Endpoint<Request, Response>
+internal class Endpoint : Endpoint<Request, Response>
 {
-    public TEMPLATEDbContext DbContext { get; set; }
+    private readonly DbService _db;
+
+    public Endpoint(TEMPLATEDbContext dbContext, DbService? db)
+    {
+        _db = db ?? new DbService(dbContext);
+    }
+
     public override void Configure()
     {
         Get("user/{Name}");

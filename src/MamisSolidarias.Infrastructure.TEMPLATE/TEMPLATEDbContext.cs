@@ -1,6 +1,5 @@
 using MamisSolidarias.Infrastructure.TEMPLATE.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MamisSolidarias.Infrastructure.TEMPLATE;
 

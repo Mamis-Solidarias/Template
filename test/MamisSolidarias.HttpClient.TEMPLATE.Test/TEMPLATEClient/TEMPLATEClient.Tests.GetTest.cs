@@ -1,30 +1,40 @@
+using System;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
-using FakeItEasy;
 using FluentAssertions;
-using Flurl;
-using Flurl.Http.Testing;
 using MamisSolidarias.HttpClient.TEMPLATE.Utils;
 using MamisSolidarias.WebAPI.TEMPLATE.Endpoints.Test;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using NUnit.Framework;
+using RichardSzalay.MockHttp;
 
 namespace MamisSolidarias.HttpClient.TEMPLATE.TEMPLATEClient;
 
 internal class TEMPLATEClientTestsGetTest
 {
-    private HttpTest? _httpRequest;
-
+    private readonly MockHttpMessageHandler _httpHandlerMock = new();
+    private readonly Mock<IHttpClientFactory> _httpClientFactory = new();
+    private readonly IConfiguration _configuration = ConfigurationFactory.GetTEMPLATEConfiguration();
+    private TEMPLATEClient _client = null!;
+    
     [SetUp]
     public void CreateHttpRequest()
     {
-        _httpRequest = new HttpTest();
+        _httpClientFactory.Setup(t => t.CreateClient("TEMPLATE"))
+            .Returns(new System.Net.Http.HttpClient(_httpHandlerMock)
+            {
+                BaseAddress = new Uri(_configuration["TEMPLATEHttpClient:BaseUrl"])
+            });
+        _client = new TEMPLATEClient(null,_httpClientFactory.Object);
     }
 
     [TearDown]
     public void DisposeHttpRequest()
     {
-        _httpRequest?.Dispose();
+        _httpHandlerMock.Clear();
     }
 
 
@@ -32,55 +42,40 @@ internal class TEMPLATEClientTestsGetTest
     public async Task WithValidParameters_Succeeds()
     {
         // arrange
-        var contextAccessor = A.Fake<IHttpContextAccessor>();
-        var configuration = ConfigurationFactory.GetTEMPLATEConfiguration();
-
-        var client = new TEMPLATEClient(contextAccessor, configuration);
-        var request = new Request {Name = "lucas"};
+        var user = DataFactory.GetUser();
+        var request = new Request {Name = user.Name};
         var expectedResponse = new Response
         {
-            Name = request.Name,
+            Name = user.Name,
             Email = "me@mail.com",
-            Id = 123
+            Id = user.Id
         };
-
-
-        _httpRequest?
-            .ForCallsTo(Url.Combine("*", "user", request.Name))
-            .WithVerb(HttpMethod.Get)
-            .RespondWithJson(expectedResponse);
-
+        
+         _httpHandlerMock.When(HttpMethod.Get, _configuration["TEMPLATEHttpClient:BaseUrl"] + $"/user/{user.Name}")
+            .Respond(HttpStatusCode.OK, JsonContent.Create(expectedResponse));
+        
         // act
-        var (status, response) = await client.GetTestAsync(request);
+        var response = await _client.GetTestAsync(request);
 
         // assert
-        _httpRequest?.ShouldHaveMadeACall();
-        status.Should().Be(200);
         response.Should().NotBeNull();
+        response.Should().BeEquivalentTo(expectedResponse);
     }
 
     [Test]
     public async Task WithInvalidUser_ThrowsNotFound()
     {
         // arrange
-        var contextAccessor = A.Fake<IHttpContextAccessor>();
-        var configuration = ConfigurationFactory.GetTEMPLATEConfiguration();
-
-        var client = new TEMPLATEClient(contextAccessor, configuration);
-        var request = new Request {Name = "lucas"};
-
-
-        _httpRequest?
-            .ForCallsTo(Url.Combine("*", "user", request.Name))
-            .WithVerb(HttpMethod.Get)
-            .RespondWith(status: 404);
-
+        var user = DataFactory.GetUser();
+        var request = new Request {Name = user.Name };
+        
+        _httpHandlerMock.When(HttpMethod.Get, _configuration["TEMPLATEHttpClient:BaseUrl"] + $"/user/{user.Name}")
+            .Respond(HttpStatusCode.NotFound);
+        
         // act
-        var (status, response) = await client.GetTestAsync(request);
+        var action = async () => await _client.GetTestAsync(request); 
 
         // assert
-        _httpRequest?.ShouldHaveMadeACall();
-        response.Should().BeNull();
-        status.Should().Be(404);
+        await action.Should().ThrowAsync<HttpRequestException>();
     }
 }

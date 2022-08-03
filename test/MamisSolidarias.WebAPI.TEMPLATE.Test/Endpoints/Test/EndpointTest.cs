@@ -1,35 +1,45 @@
 using System.Threading.Tasks;
-using FakeItEasy;
 using FastEndpoints;
 using Microsoft.Extensions.Logging;
 using FluentAssertions;
 using MamisSolidarias.WebAPI.TEMPLATE.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NUnit.Framework;
 
 namespace MamisSolidarias.WebAPI.TEMPLATE.Endpoints.Test;
 
 internal class EndpointTest
 {
+    private readonly Mock<ILogger<Endpoint<Request, Response>>> _mockLogger = new();
+    private readonly Mock<DbService> _mockDbService = new ();
+    private Endpoint _endpoint = null!;
+    
+    [SetUp]
+    public void Setup()
+    {
+        _endpoint = EndpointFactory.CreateEndpoint<Endpoint, Request, Response>(
+            s => s.AddSingleton(_mockLogger.Object),
+            null,_mockDbService.Object
+        );
+    }
+    
     [Test]
     public async Task WithValidParameters_Succeeds()
     {
         //arrange
-        var logger = A.Fake<ILogger<Endpoint<Request, Response>>>();
-        var endpoint = EndpointFactory.CreateEndpoint<Endpoint, Request, Response>(s => s.AddSingleton(logger));
-
         var req = new Request
         {
             Name = "lucas"
         };
 
         //act
-        await endpoint.HandleAsync(req, default);
-        var response = endpoint.Response;
+        await _endpoint.HandleAsync(req, default);
+        var response = _endpoint.Response;
 
         //assert
         response.Should().NotBeNull();
-        endpoint.ValidationFailed.Should().BeFalse();
+        _endpoint.ValidationFailed.Should().BeFalse();
         response.Name.Should().Be("Lucassss");
         response.Id.Should().BePositive().And.BeLessThanOrEqualTo(10);
         response.Email.Should().Be("mymail@mail.com");
@@ -39,20 +49,17 @@ internal class EndpointTest
     public async Task WithNonExistentUser_ThrowsNotFound()
     {
         //arrange
-        var logger = A.Fake<ILogger<Endpoint<Request, Response>>>();
-        var endpoint = EndpointFactory.CreateEndpoint<Endpoint, Request, Response>(s => s.AddSingleton(logger));
-
         var req = new Request
         {
             Name = "Not lucas"
         };
 
         //act
-        await endpoint.HandleAsync(req, default);
-        var statusCode = endpoint.HttpContext.Response.StatusCode;
+        await _endpoint.HandleAsync(req, default);
+        var statusCode = _endpoint.HttpContext.Response.StatusCode;
 
         //assert
-        endpoint.ValidationFailed.Should().BeFalse();
+        _endpoint.ValidationFailed.Should().BeFalse();
         statusCode.Should().Be(404);
     }
 }
