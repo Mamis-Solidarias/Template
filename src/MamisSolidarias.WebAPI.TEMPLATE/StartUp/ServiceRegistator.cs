@@ -46,6 +46,6 @@ internal static class ServiceRegistrator
         );
 
         if (!builder.Environment.IsProduction())
-            builder.Services.AddSwaggerDoc(tagIndex: 1, shortSchemaNames: true);
+            builder.Services.AddSwaggerDoc();
     }
 }
