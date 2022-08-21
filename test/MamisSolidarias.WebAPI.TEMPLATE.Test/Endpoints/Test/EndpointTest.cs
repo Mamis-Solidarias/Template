@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using FastEndpoints;
 using Microsoft.Extensions.Logging;
 using FluentAssertions;
+using MamisSolidarias.Utils.Test;
 using MamisSolidarias.WebAPI.TEMPLATE.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -11,17 +12,16 @@ namespace MamisSolidarias.WebAPI.TEMPLATE.Endpoints.Test;
 
 internal class EndpointTest
 {
-    private readonly Mock<ILogger<Endpoint<Request, Response>>> _mockLogger = new();
     private readonly Mock<DbService> _mockDbService = new ();
     private Endpoint _endpoint = null!;
     
     [SetUp]
     public void Setup()
     {
-        _endpoint = EndpointFactory.CreateEndpoint<Endpoint, Request, Response>(
-            s => s.AddSingleton(_mockLogger.Object),
-            null,_mockDbService.Object
-        );
+        _endpoint = EndpointFactory
+            .CreateEndpoint<Endpoint>(null,_mockDbService.Object)
+            .WithEndpointLogger<Request,Response>()
+            .Build();
     }
     
     [Test]
