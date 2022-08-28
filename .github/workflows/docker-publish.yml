@@ -12,6 +12,9 @@ on:
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
+    paths:
+      - src/MamisSolidarias.WebAPI.TEMPLATE/Dockerfile
+      - .github/workflows/docker-publish.yml
     
   workflow_dispatch:
     
