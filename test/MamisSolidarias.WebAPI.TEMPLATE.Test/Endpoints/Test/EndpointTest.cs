@@ -1,10 +1,6 @@
 using System.Threading.Tasks;
-using FastEndpoints;
-using Microsoft.Extensions.Logging;
 using FluentAssertions;
 using MamisSolidarias.Utils.Test;
-using MamisSolidarias.WebAPI.TEMPLATE.Utils;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 
