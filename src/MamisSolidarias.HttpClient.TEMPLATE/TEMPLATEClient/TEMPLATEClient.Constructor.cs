@@ -20,10 +20,6 @@ public partial class TEMPLATEClient : ITEMPLATEClient
         var client = _httpClientFactory.CreateClient("TEMPLATE");
         var request = new HttpRequestMessage(httpMethod, string.Join('/', urlParams));
         
-        var authHeader = _headerService.GetAuthorization();
-        if (authHeader is not null)
-            request.Headers.Add("Authorization",authHeader);
-        
         return new ReadyRequest(client,request);
     }
 }
