@@ -12,36 +12,44 @@ internal static class ServiceRegistrator
 {
     public static void Register(WebApplicationBuilder builder)
     {
-
         var connectionString = builder.Environment.EnvironmentName.ToLower() switch
         {
             "production" => builder.Configuration.GetConnectionString("Production"),
             _ => builder.Configuration.GetConnectionString("Development")
         };
-        
+
         builder.Services.AddOpenTelemetryTracing(tracerProviderBuilder =>
         {
             tracerProviderBuilder
                 .AddConsoleExporter()
-                // .AddOtlpExporter(opt =>
-                // {
-                //     opt.Endpoint = new Uri("https://otlp.nr-data.net");
-                //     opt.Headers["api-key"] = "";
-                //     opt.Protocol = OtlpExportProtocol.HttpProtobuf;
-                // })
-                .AddSource(builder.Configuration["Service:Name"])
+                .AddJaegerExporter(t =>
+                {
+                    t.Endpoint = new Uri(
+                        builder.Configuration["OpenTelemetry:Jaeger:Endpoint"]
+                        ?? "http://localhost:14268/api/traces"
+                    );
+                })
+                .AddSource(builder.Configuration["OpenTelemetry:Name"])
                 .SetResourceBuilder(
                     ResourceBuilder.CreateDefault()
-                        .AddService(serviceName: builder.Configuration["Service:Name"], serviceVersion: builder.Configuration["Service:Version"]))
-                .AddHttpClientInstrumentation()
-                .AddAspNetCoreInstrumentation()
-                .AddEntityFrameworkCoreInstrumentation();
-        });        
+                        .AddService(
+                            builder.Configuration["OpenTelemetry:Name"],
+                            serviceVersion: builder.Configuration["OpenTelemetry:Version"]
+                        )
+                )
+                .AddHttpClientInstrumentation(t =>
+                {
+                    t.RecordException = true;
+                    t.SetHttpFlavor = true;
+                })
+                .AddAspNetCoreInstrumentation(t=> t.RecordException = true)
+                .AddEntityFrameworkCoreInstrumentation(t=> t.SetDbStatementForText = true);
+        });
         builder.Services.AddFastEndpoints();
         builder.Services.AddAuthenticationJWTBearer(builder.Configuration["JWT:Key"]);
         builder.Services.AddDbContext<TEMPLATEDbContext>(
-            t => 
-                t.UseNpgsql(connectionString, r=> r.MigrationsAssembly("MamisSolidarias.WebAPI.TEMPLATE"))
+            t =>
+                t.UseNpgsql(connectionString, r => r.MigrationsAssembly("MamisSolidarias.WebAPI.TEMPLATE"))
                     .EnableSensitiveDataLogging(!builder.Environment.IsProduction())
         );
 
