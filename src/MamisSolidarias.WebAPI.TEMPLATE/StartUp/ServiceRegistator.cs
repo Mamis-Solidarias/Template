@@ -2,6 +2,7 @@ using FastEndpoints;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using MamisSolidarias.Infrastructure.TEMPLATE;
+using MamisSolidarias.WebAPI.TEMPLATE.Extensions;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -12,13 +13,14 @@ internal static class ServiceRegistrator
 {
     public static void Register(WebApplicationBuilder builder)
     {
+        builder.Services.AddDataProtection(builder.Configuration);
 
         var connectionString = builder.Environment.EnvironmentName.ToLower() switch
         {
             "production" => builder.Configuration.GetConnectionString("Production"),
             _ => builder.Configuration.GetConnectionString("Development")
         };
-        
+
         builder.Services.AddOpenTelemetryTracing(tracerProviderBuilder =>
         {
             tracerProviderBuilder
@@ -32,16 +34,17 @@ internal static class ServiceRegistrator
                 .AddSource(builder.Configuration["Service:Name"])
                 .SetResourceBuilder(
                     ResourceBuilder.CreateDefault()
-                        .AddService(serviceName: builder.Configuration["Service:Name"], serviceVersion: builder.Configuration["Service:Version"]))
+                        .AddService(builder.Configuration["Service:Name"],
+                            serviceVersion: builder.Configuration["Service:Version"]))
                 .AddHttpClientInstrumentation()
                 .AddAspNetCoreInstrumentation()
                 .AddEntityFrameworkCoreInstrumentation();
-        });        
+        });
         builder.Services.AddFastEndpoints();
         builder.Services.AddAuthenticationJWTBearer(builder.Configuration["JWT:Key"]);
         builder.Services.AddDbContext<TEMPLATEDbContext>(
-            t => 
-                t.UseNpgsql(connectionString, r=> r.MigrationsAssembly("MamisSolidarias.WebAPI.TEMPLATE"))
+            t =>
+                t.UseNpgsql(connectionString, r => r.MigrationsAssembly("MamisSolidarias.WebAPI.TEMPLATE"))
                     .EnableSensitiveDataLogging(!builder.Environment.IsProduction())
         );
 
