@@ -14,32 +14,13 @@ internal static class ServiceRegistrator
     public static void Register(WebApplicationBuilder builder)
     {
         builder.Services.AddDataProtection(builder.Configuration);
-
+        builder.Services.AddOpenTelemetry(builder.Configuration,builder.Logging);
         var connectionString = builder.Environment.EnvironmentName.ToLower() switch
         {
             "production" => builder.Configuration.GetConnectionString("Production"),
             _ => builder.Configuration.GetConnectionString("Development")
         };
-
-        builder.Services.AddOpenTelemetryTracing(tracerProviderBuilder =>
-        {
-            tracerProviderBuilder
-                .AddConsoleExporter()
-                // .AddOtlpExporter(opt =>
-                // {
-                //     opt.Endpoint = new Uri("https://otlp.nr-data.net");
-                //     opt.Headers["api-key"] = "";
-                //     opt.Protocol = OtlpExportProtocol.HttpProtobuf;
-                // })
-                .AddSource(builder.Configuration["Service:Name"])
-                .SetResourceBuilder(
-                    ResourceBuilder.CreateDefault()
-                        .AddService(builder.Configuration["Service:Name"],
-                            serviceVersion: builder.Configuration["Service:Version"]))
-                .AddHttpClientInstrumentation()
-                .AddAspNetCoreInstrumentation()
-                .AddEntityFrameworkCoreInstrumentation();
-        });
+        
         builder.Services.AddFastEndpoints();
         builder.Services.AddAuthenticationJWTBearer(builder.Configuration["JWT:Key"]);
         builder.Services.AddDbContext<TEMPLATEDbContext>(
