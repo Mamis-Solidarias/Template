@@ -14,7 +14,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="FastEndpoints.Security" Version="5.1.0" />
-        <PackageReference Include="FastEndpoints.Swagger" Version="5.1.0" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="5.4.0" />
         <PackageReference Include="HotChocolate.Diagnostics" Version="12.15.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">
           <PrivateAssets>all</PrivateAssets>
