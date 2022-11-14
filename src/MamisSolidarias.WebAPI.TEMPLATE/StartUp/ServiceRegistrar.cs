@@ -23,6 +23,7 @@ internal static class ServiceRegistrar
 
         builder.Services.AddDataProtection(builder.Configuration);
         builder.Services.AddOpenTelemetry(builder.Configuration, builder.Logging);
+        builder.Services.AddRedis(builder.Configuration,loggerFactory);
 
         builder.Services.AddDbContext(builder.Configuration, builder.Environment, loggerFactory);
 
