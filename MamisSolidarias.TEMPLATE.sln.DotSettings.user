@@ -7,4 +7,6 @@
     &lt;TestId&gt;NUnit3x::11775FBD-97F2-4E2C-A10F-8D6306FDCD71::net6.0::MamisSolidarias.HttpClient.TEMPLATE.TEMPLATEClient.TEMPLATEClientTestsGetTest.WithInvalidUser_ThrowsNotFound&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::11775FBD-97F2-4E2C-A10F-8D6306FDCD71::net6.0::MamisSolidarias.HttpClient.TEMPLATE.TEMPLATEClient.TEMPLATEClientTestsGetTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+&lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Mamis/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Solidarias/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
