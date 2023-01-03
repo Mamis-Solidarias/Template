@@ -9,10 +9,18 @@ namespace MamisSolidarias.WebAPI.TEMPLATE.Extensions;
 
 internal static class OpenTelemetryExtensions
 {
+    private static ILogger? _logger;
     public static void AddOpenTelemetry(this IServiceCollection services, IConfiguration configuration,
-        ILoggingBuilder logging)
+        ILoggingBuilder logging, ILoggerFactory loggerFactory)
     {
+        _logger = loggerFactory.CreateLogger("OpenTelemetry");
         var options = configuration.GetSection("OpenTelemetry").Get<OpenTelemetryOptions>();
+
+        if (options is null)
+        {
+            _logger.LogError("OpenTelemetry options are not configured");
+            throw new ArgumentException("OpenTelemetry options are not configured");
+        }
 
         var resourceBuilder = ResourceBuilder
             .CreateDefault()
@@ -62,7 +70,10 @@ internal static class OpenTelemetryExtensions
         NewRelicOptions? newRelicOptions)
     {
         if (string.IsNullOrWhiteSpace(newRelicOptions?.Url) || string.IsNullOrWhiteSpace(newRelicOptions.ApiKey))
+        {
+            _logger?.LogWarning("NewRelic Traces options are not configured");
             return builder;
+        }
         
         return builder.AddOtlpExporter(t =>
         {
@@ -75,7 +86,10 @@ internal static class OpenTelemetryExtensions
         NewRelicOptions? newRelicOptions)
     {
         if (string.IsNullOrWhiteSpace(newRelicOptions?.Url) || string.IsNullOrWhiteSpace(newRelicOptions.ApiKey))
+        {
+            _logger?.LogWarning("NewRelic Logger options are not configured");
             return builder;
+        }
 
         return builder.AddOtlpExporter(t =>
         {
@@ -88,7 +102,10 @@ internal static class OpenTelemetryExtensions
         NewRelicOptions? newRelicOptions)
     {
         if (string.IsNullOrWhiteSpace(newRelicOptions?.Url) || string.IsNullOrWhiteSpace(newRelicOptions.ApiKey))
+        {
+            _logger?.LogWarning("NewRelic Metrics options are not configured");
             return builder;
+        }
 
         return builder.AddOtlpExporter((t, m) =>
         {
@@ -102,7 +119,10 @@ internal static class OpenTelemetryExtensions
         JaegerOptions? jaegerOptions)
     {
         if (jaegerOptions is null || string.IsNullOrWhiteSpace(jaegerOptions.Url))
+        {
+            _logger?.LogWarning("Jaeger options are not configured");
             return builder;
+        }
 
         return builder.AddJaegerExporter(t => t.AgentHost = jaegerOptions.Url);
     }

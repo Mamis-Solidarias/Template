@@ -1,5 +1,4 @@
 using FastEndpoints;
-using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using MamisSolidarias.WebAPI.TEMPLATE.Extensions;
 
@@ -20,14 +19,14 @@ internal static class ServiceRegistrar
         using var loggerFactory = CreateLoggerFactory(builder.Configuration);
 
         builder.Services.AddDataProtection(builder.Configuration);
-        builder.Services.AddOpenTelemetry(builder.Configuration, builder.Logging);
+        builder.Services.AddOpenTelemetry(builder.Configuration, builder.Logging, loggerFactory);
         builder.Services.AddRedis(builder.Configuration, loggerFactory);
 
         builder.Services.AddDbContext(builder.Configuration, builder.Environment, loggerFactory);
 
-        builder.Services.AddGraphQl(builder.Configuration,loggerFactory);
+        builder.Services.AddGraphQl(builder.Configuration, loggerFactory);
         builder.Services.AddFastEndpoints();
-        builder.Services.AddAuthenticationJWTBearer(builder.Configuration["JWT:Key"]);
+        builder.Services.AddAuth(builder.Configuration, loggerFactory);
 
         if (!builder.Environment.IsProduction())
             builder.Services.AddSwaggerDoc();
