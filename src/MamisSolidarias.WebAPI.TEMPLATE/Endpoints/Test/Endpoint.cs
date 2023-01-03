@@ -29,7 +29,7 @@ internal class Endpoint : Endpoint<Request, Response>
         await SendAsync(new Response
         {
             Email = "mymail@mail.com",
-            Id = new Random().Next(10),
+            Id = new Random().Next(1,10),
             Name = "Lucassss"
         }, cancellation: ct);
     }
