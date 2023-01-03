@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MamisSolidarias.WebAPI.TEMPLATE.Extensions;
 
-internal static class DbContextExtensions
+internal static class EntityFrameworkExtensions
 {
     public static void AddDbContext(this IServiceCollection services, IConfiguration configuration,
         IWebHostEnvironment env, ILoggerFactory loggerFactory)
     {
-        var logger = loggerFactory.CreateLogger(typeof(DbContextExtensions));
+        var logger = loggerFactory.CreateLogger(typeof(EntityFrameworkExtensions));
         
         var connectionString = configuration.GetConnectionString("TEMPLATEDb");
 
@@ -24,5 +24,12 @@ internal static class DbContextExtensions
                         r.MigrationsAssembly("MamisSolidarias.WebAPI.TEMPLATE"))
                     .EnableSensitiveDataLogging(!env.IsProduction())
         );
+    }
+
+    public static void RunMigrations(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<TEMPLATEDbContext>();
+        db.Database.Migrate();
     }
 }

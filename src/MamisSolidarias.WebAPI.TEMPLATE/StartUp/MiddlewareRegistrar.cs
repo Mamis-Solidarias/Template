@@ -1,11 +1,12 @@
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using MamisSolidarias.Infrastructure.TEMPLATE;
+using MamisSolidarias.WebAPI.TEMPLATE.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MamisSolidarias.WebAPI.TEMPLATE.StartUp;
 
-internal static class MiddlewareRegistrator
+internal static class MiddlewareRegistrar
 {
     public static void Register(WebApplication app)
     {
@@ -13,12 +14,8 @@ internal static class MiddlewareRegistrator
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseFastEndpoints();
-        
-        using (var scope = app.Services.CreateScope())
-        {
-            var db = scope.ServiceProvider.GetRequiredService<TEMPLATEDbContext>();
-            db.Database.Migrate();
-        }
+        app.MapGraphQL();
+        app.RunMigrations();
 
         if (app.Environment.IsDevelopment())
         {
